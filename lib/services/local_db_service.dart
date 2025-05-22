@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:absen/models/attendance.dart';
 import 'package:absen/services/facenet_service.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -54,6 +55,13 @@ class LocalDBService {
       'nik': nik,
       'timestamp': DateTime.now().toString(),
     });
+  }
+
+  static Future<List<Attendance>> getAttendanceHistory() async {
+    final db = await database;
+    final result = await db.query('attendance');
+
+    return result.map((e) => Attendance.fromMap(e)).toList();
   }
 
   static Future<List<double>> getEmployeeEmbedding(String nik) async {

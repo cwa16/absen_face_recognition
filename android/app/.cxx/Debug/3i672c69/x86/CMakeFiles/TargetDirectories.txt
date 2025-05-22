@@ -1,0 +1,2 @@
+D:/App/flutter/absen_face_recognition/android/app/.cxx/Debug/3i672c69/x86/CMakeFiles/edit_cache.dir
+D:/App/flutter/absen_face_recognition/android/app/.cxx/Debug/3i672c69/x86/CMakeFiles/rebuild_cache.dir

@@ -1,3 +1,4 @@
+import 'package:absen/models/attendance.dart';
 import 'package:absen/services/facenet_service.dart';
 import 'package:get/get.dart';
 import 'dart:io';
@@ -6,6 +7,8 @@ import '../services/face_service.dart';
 import '../services/local_db_service.dart';
 
 class AttendanceController extends GetxController {
+  RxList<Attendance> attendanceList = <Attendance>[].obs;
+
   var isCameraPermissionGranted = true.obs;
   var attendanceStatus = "".obs;
   var matchedFacePath = "".obs;
@@ -18,10 +21,11 @@ class AttendanceController extends GetxController {
   void onInit() {
     super.onInit();
     _startAutoScan();
+    loadAttendanceHistory();
   }
 
   void _startAutoScan() {
-    Timer.periodic(Duration(seconds: 5), (timer) async {
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
       if (!isProcessing.value) {
         isProcessing.value = true;
         await _captureAndProcess();
@@ -64,13 +68,25 @@ class AttendanceController extends GetxController {
         await LocalDBService.markAttendance(matchedNIK);
         attendanceStatus.value = "Attendance Recorded for NIK: $matchedNIK ✅";
         Get.snackbar("Success", "Attendance Recorded for NIK: $matchedNIK ✅");
+        attendanceStatus.value = "";
+        matchedFacePath.value = "";
       } else {
         attendanceStatus.value = "Face Not Recognized ❌";
         Get.snackbar("Error", "Face Not Recognized ❌");
       }
     } else {
       attendanceStatus.value = "No Face Detected!";
-       Get.snackbar("Error", "No Face Detected!");
+      Get.snackbar("Error", "No Face Detected!");
+    }
+  }
+
+  Future<void> loadAttendanceHistory() async {
+    try {
+      final data = await LocalDBService.getAttendanceHistory();
+      print("Load dari DB: ${data.length} data");
+      attendanceList.assignAll(data.reversed.toList());
+    } catch (e) {
+      print("Error loading attendance history: $e");
     }
   }
 }
